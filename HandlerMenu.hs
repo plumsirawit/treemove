@@ -1,5 +1,6 @@
 module HandlerMenu where
 
+import Data.Maybe (fromJust)
 import GameState
 import Level
 
@@ -21,7 +22,7 @@ handleReset goGame goMenu z =
     GameState
       { levelIdent = levelIdent z,
         initialLevel = initialLevel z,
-        zipper = (Hole, initialLevel z),
+        zipper = fromJust $ zipToStart $ initialLevel z,
         movesCount = 0,
         bonusCount = 0
       }

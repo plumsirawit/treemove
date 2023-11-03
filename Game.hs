@@ -43,7 +43,9 @@ repl :: IO ()
 repl = do
   putStrLn "Welcome to Treemove.\n"
   putStrLn "You are at the example level."
-  goGame $
+  handleReset
+    goGame
+    goMenu
     GameState
       { levelIdent = "T1",
         initialLevel = t1,

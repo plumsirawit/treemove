@@ -52,6 +52,15 @@ combineIdent (Node k t) = Node (show (fst k) ++ " (" ++ snd k ++ ")") (map combi
 drawLTree :: LTree -> String
 drawLTree = drawTree . combineIdent
 
+dfsAux :: LZip -> Maybe LZip
+dfsAux (c, t) =
+  if fst (rootLabel t) == S
+    then Just (c, t)
+    else foldr (\ch res -> let x = dfsAux $ fromJust $ goDown (c, t) (snd $ rootLabel ch) in if x == Nothing then res else x) Nothing (subForest t)
+
+zipToStart :: LTree -> Maybe LZip
+zipToStart lt = dfsAux (Hole, lt)
+
 -- example use case:
 
 t1 :: LTree
