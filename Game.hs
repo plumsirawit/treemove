@@ -16,6 +16,7 @@ goGame z = do
     Nothing -> do
       putStrLn "I'm sorry, I do not understand."
       goGame z
+    Just Where -> handleWhere goGame goMenu z
     Just LookAround -> handleLook goGame goMenu z
     Just CheckInventory -> handleCheck goGame goMenu z
     Just (UseInventoryWith s) -> handleUse goGame goMenu z s

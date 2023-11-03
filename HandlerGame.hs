@@ -5,6 +5,13 @@ import Data.Tree
 import GameState
 import Level
 
+handleWhere :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
+handleWhere goGame goMenu z = do
+  let (cxt, tr) = zipper z
+  let k = rootLabel tr
+  putStrLn $ "You're at " ++ show (fst k) ++ "(" ++ snd k ++ ")."
+  goGame z
+
 handleLook :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
 handleLook goGame goMenu z = do
   let (cxt, tr) = zipper z

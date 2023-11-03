@@ -53,7 +53,12 @@ label :: Parser String String
 label = sat (const True) -- get any string
 
 parseCmd :: Parser String Cmd
-parseCmd = parseLook <|> parseCheck <|> parseUse <|> parseDrop <|> parseGoto <|> parseMenu
+parseCmd = parseWhere <|> parseLook <|> parseCheck <|> parseUse <|> parseDrop <|> parseGoto <|> parseMenu
+
+parseWhere :: Parser String Cmd
+parseWhere = do
+  match "where"
+  return Where
 
 parseLook :: Parser String Cmd
 parseLook = do
