@@ -52,22 +52,34 @@ handleGoto goGame goMenu z t = do
   let (cxt, tr) = zipper z
   case getDir (cxt, tr) t of
     Nothing -> do
-      putStrLn $ "node " ++ t ++ " not found"
+      putStrLn $ "Node " ++ t ++ " not found."
       goGame z
     Just dir -> case dir of
       Up -> case goUp (cxt, tr) of
         Just (ncxt, ntr) ->
-          goGame
-            ( GameState
-                { levelIdent = levelIdent z,
-                  initialLevel = initialLevel z,
-                  zipper = (ncxt, ntr),
-                  movesCount = 1 + movesCount z,
-                  bonusCount = bonusCount z
-                }
-            )
+          if fst (rootLabel ntr) == Z
+            then
+              goGame
+                ( GameState
+                    { levelIdent = levelIdent z,
+                      initialLevel = initialLevel z,
+                      zipper = (ncxt, Node (E, snd (rootLabel ntr)) (subForest ntr)),
+                      movesCount = 1 + movesCount z,
+                      bonusCount = 1 + bonusCount z
+                    }
+                )
+            else
+              goGame
+                ( GameState
+                    { levelIdent = levelIdent z,
+                      initialLevel = initialLevel z,
+                      zipper = (ncxt, ntr),
+                      movesCount = 1 + movesCount z,
+                      bonusCount = bonusCount z
+                    }
+                )
         Nothing -> do
-          putStrLn "cannot go there"
+          putStrLn "You cannot go there."
           goGame z
       Down tt -> case goDown (cxt, tr) tt of
         Just (ncxt, ntr) ->
@@ -81,5 +93,5 @@ handleGoto goGame goMenu z t = do
                 }
             )
         Nothing -> do
-          putStrLn "cannot go there"
+          putStrLn "You cannot go there."
           goGame z

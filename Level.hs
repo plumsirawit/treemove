@@ -32,10 +32,26 @@ goDown (c, Node k f) s =
   let g = find (\a -> snd (rootLabel a) == s) f
    in case g of
         Nothing -> Nothing
-        Just subtree -> Just (TreeHole k c (delete subtree f), subtree)
+        Just subtree -> case fst (rootLabel subtree) of
+          B -> Just (TreeHole k c (delete subtree f), subtree)
+          E -> Just (TreeHole k c (delete subtree f), subtree)
+          S -> Just (TreeHole k c (delete subtree f), subtree)
+          F -> Just (TreeHole k c (delete subtree f), subtree)
+          W -> Nothing
+          Key _ -> Just (TreeHole k c (delete subtree f), subtree)
+          Gate _ -> Nothing
+          Z -> Just (TreeHole k c (delete subtree f), subtree)
 
 goUp :: LZip -> Maybe LZip
-goUp (TreeHole k c t, out) = Just (c, Node k (out : t))
+goUp (TreeHole k c t, out) = case fst k of
+  B -> Just (c, Node k (out : t))
+  E -> Just (c, Node k (out : t))
+  S -> Just (c, Node k (out : t))
+  F -> Just (c, Node k (out : t))
+  W -> Nothing
+  Key _ -> Just (c, Node k (out : t))
+  Gate _ -> Nothing
+  Z -> Just (c, Node k (out : t))
 goUp (Hole, _) = Nothing
 
 unzipToTree :: LZip -> LTree
