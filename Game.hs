@@ -20,7 +20,7 @@ goGame z = do
     Just CheckInventory -> handleCheck goGame goMenu z
     Just (UseInventoryWith s) -> handleUse goGame goMenu z s
     Just DropInventory -> handleDrop goGame goMenu z
-    Just (Goto t) -> handleGoto goGame goMenu z
+    Just (Goto t) -> handleGoto goGame goMenu z t
     Just Menu -> goMenu z
 
 goMenu :: GameState -> IO ()
