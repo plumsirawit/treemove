@@ -1,9 +1,31 @@
 module HandlerGame where
 
 import Data.List
+import Data.Maybe (fromJust)
 import Data.Tree
 import GameState
 import Level
+
+data GoDir = Up LNode | Down LNode
+
+getDir :: LZip -> String -> Maybe GoDir
+getDir (cxt, tr) t =
+  let chs = map rootLabel $ subForest tr
+   in case find (\x -> snd x == t) chs of
+        Just ch -> Just (Down ch)
+        Nothing ->
+          if cxt == Hole
+            then Nothing
+            else
+              let (TreeHole k _ _) = cxt
+               in if snd k == t
+                    then Just (Up k)
+                    else Nothing
+
+nodeType :: GoDir -> LType
+nodeType dir = fst $ case dir of
+  Up x -> x
+  Down x -> x
 
 handleWhere :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
 handleWhere goGame goMenu z = do
@@ -29,8 +51,62 @@ handleCheck goGame goMenu z = do
     Nothing -> putStrLn "You have nothing in your inventory."
   goGame z
 
+-- changes W to E, Gate to E
+mutateNode :: LZip -> Maybe LZip
+mutateNode (cxt, tr) =
+  case fst $ rootLabel tr of
+    W -> Just (cxt, Node (E, snd $ rootLabel tr) (subForest tr))
+    Gate _ -> Just (cxt, Node (E, snd $ rootLabel tr) (subForest tr))
+    _ -> Nothing
+
+mutateTree :: GoDir -> LZip -> LZip
+mutateTree dir z =
+  let cur = snd $ rootLabel $ snd z
+   in case dir of
+        Up k -> fromJust $ goDown (fromJust $ mutateNode $ fromJust $ goUp z) cur
+        Down k -> fromJust $ goUp $ fromJust $ mutateNode $ fromJust $ goDown z (snd k)
+
 handleUse :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> String -> IO ()
-handleUse = undefined -- todo
+handleUse goGame goMenu z t = do
+  case getDir (zipper z) t of
+    Nothing -> do
+      putStrLn $ "Node " ++ t ++ " not found."
+      goGame z
+    Just dir -> do
+      case inventory z of
+        Nothing -> do
+          putStrLn "Inventory is empty."
+          goGame z
+        Just item -> do
+          case (nodeType dir, item) of
+            (W, ItemBox) ->
+              goGame
+                GameState
+                  { levelIdent = levelIdent z,
+                    initialLevel = initialLevel z,
+                    zipper = mutateTree dir (zipper z),
+                    movesCount = movesCount z,
+                    bonusCount = bonusCount z,
+                    inventory = Nothing
+                  }
+            (Gate x, ItemKey y) ->
+              if x == y
+                then
+                  goGame
+                    GameState
+                      { levelIdent = levelIdent z,
+                        initialLevel = initialLevel z,
+                        zipper = mutateTree dir (zipper z),
+                        movesCount = movesCount z,
+                        bonusCount = bonusCount z,
+                        inventory = Nothing
+                      }
+                else do
+                  putStrLn "Invalid key."
+                  goGame z
+            _ -> do
+              putStrLn $ "Cannot use item " ++ show item ++ " with node " ++ show (nodeType dir)
+              goGame z
 
 handleDrop :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
 handleDrop goGame goMenu z =
@@ -77,22 +153,6 @@ handlePick goGame goMenu z = do
             }
         )
 
-data GoDir = Up | Down String
-
-getDir :: LZip -> String -> Maybe GoDir
-getDir (cxt, tr) t =
-  let chs = map rootLabel $ subForest tr
-   in case find (\x -> snd x == t) chs of
-        Just ch -> Just (Down t)
-        Nothing ->
-          if cxt == Hole
-            then Nothing
-            else
-              let (TreeHole k _ _) = cxt
-               in if snd k == t
-                    then Just Up
-                    else Nothing
-
 handleGoto :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> String -> IO ()
 handleGoto goGame goMenu z t = do
   let (cxt, tr) = zipper z
@@ -101,7 +161,7 @@ handleGoto goGame goMenu z t = do
       putStrLn $ "Node " ++ t ++ " not found."
       goGame z
     Just dir -> case dir of
-      Up -> case goUp (cxt, tr) of
+      Up _ -> case goUp (cxt, tr) of
         Just (ncxt, ntr) ->
           if fst (rootLabel ntr) == Z
             then
@@ -129,7 +189,7 @@ handleGoto goGame goMenu z t = do
         Nothing -> do
           putStrLn "You cannot go there."
           goGame z
-      Down tt -> case goDown (cxt, tr) tt of
+      Down tt -> case goDown (cxt, tr) (snd tt) of
         Just (ncxt, ntr) ->
           goGame
             ( GameState
