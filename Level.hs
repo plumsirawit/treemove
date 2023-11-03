@@ -93,3 +93,6 @@ t1 =
     ]
 
 -- to try: putStrLn $ drawLTree $ unzipToTree $ markCurrentPosition $ fromJust (goDown (Hole, t1) "N2")
+
+loadLevel :: String -> LTree
+loadLevel = undefined -- todo

@@ -120,3 +120,8 @@ parseQuit :: Parser String MenuCmd
 parseQuit = do
   match "quit" <|> match "q"
   return Quit
+
+parseInput :: MonadFail m => Parser String a -> String -> m a
+parseInput p s = case runParser p (words s) of
+  Just (x, ts') -> if null ts' then return x else fail "runParserInput: some tokens left"
+  Nothing -> fail "runParserInput: failed to parse"
