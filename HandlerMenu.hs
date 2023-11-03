@@ -13,7 +13,8 @@ handleSelect goGame goMenu z s =
             initialLevel = newlv,
             zipper = (Hole, newlv),
             movesCount = 0,
-            bonusCount = 0
+            bonusCount = 0,
+            inventory = inventory z
           }
 
 handleReset :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
@@ -24,7 +25,8 @@ handleReset goGame goMenu z =
         initialLevel = initialLevel z,
         zipper = fromJust $ zipToStart $ initialLevel z,
         movesCount = 0,
-        bonusCount = 0
+        bonusCount = 0,
+        inventory = inventory z
       }
 
 handleQuit :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()

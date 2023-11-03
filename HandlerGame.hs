@@ -23,13 +23,59 @@ handleLook goGame goMenu z = do
   goGame z
 
 handleCheck :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
-handleCheck = undefined -- todo
+handleCheck goGame goMenu z = do
+  case inventory z of
+    Just item -> putStrLn $ "You have " ++ show item ++ " in your inventory."
+    Nothing -> putStrLn "You have nothing in your inventory."
+  goGame z
 
 handleUse :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> String -> IO ()
 handleUse = undefined -- todo
 
 handleDrop :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
-handleDrop = undefined -- todo
+handleDrop goGame goMenu z =
+  if fst (rootLabel $ snd $ zipper z) /= E
+    then do
+      putStrLn "The current node is not empty."
+      goGame z
+    else do
+      let item = inventory z
+      case item of
+        Just it -> do
+          putStrLn $ "Dropping " ++ show it ++ " from your inventory."
+          goGame
+            ( GameState
+                { levelIdent = levelIdent z,
+                  initialLevel = initialLevel z,
+                  zipper = zipper z,
+                  movesCount = movesCount z,
+                  bonusCount = bonusCount z,
+                  inventory = Nothing
+                }
+            )
+        Nothing -> do
+          putStrLn "Nothing to drop."
+          goGame z
+
+handlePick :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
+handlePick goGame goMenu z = do
+  let item = getItem (zipper z)
+  case inventory z of
+    Just item -> do
+      putStrLn "Your inventory is full."
+      goGame z
+    Nothing -> do
+      putStrLn $ "Picking " ++ show item ++ " up."
+      goGame
+        ( GameState
+            { levelIdent = levelIdent z,
+              initialLevel = initialLevel z,
+              zipper = zipper z,
+              movesCount = movesCount z,
+              bonusCount = bonusCount z,
+              inventory = item
+            }
+        )
 
 data GoDir = Up | Down String
 
@@ -65,7 +111,8 @@ handleGoto goGame goMenu z t = do
                       initialLevel = initialLevel z,
                       zipper = (ncxt, Node (E, snd (rootLabel ntr)) (subForest ntr)),
                       movesCount = 1 + movesCount z,
-                      bonusCount = 1 + bonusCount z
+                      bonusCount = 1 + bonusCount z,
+                      inventory = inventory z
                     }
                 )
             else
@@ -75,7 +122,8 @@ handleGoto goGame goMenu z t = do
                       initialLevel = initialLevel z,
                       zipper = (ncxt, ntr),
                       movesCount = 1 + movesCount z,
-                      bonusCount = bonusCount z
+                      bonusCount = bonusCount z,
+                      inventory = inventory z
                     }
                 )
         Nothing -> do
@@ -89,7 +137,8 @@ handleGoto goGame goMenu z t = do
                   initialLevel = initialLevel z,
                   zipper = (ncxt, ntr),
                   movesCount = 1 + movesCount z,
-                  bonusCount = bonusCount z
+                  bonusCount = bonusCount z,
+                  inventory = inventory z
                 }
             )
         Nothing -> do

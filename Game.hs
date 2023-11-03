@@ -21,6 +21,7 @@ goGame z = do
     Just CheckInventory -> handleCheck goGame goMenu z
     Just (UseInventoryWith s) -> handleUse goGame goMenu z s
     Just DropInventory -> handleDrop goGame goMenu z
+    Just PickInventory -> handlePick goGame goMenu z
     Just (Goto t) -> handleGoto goGame goMenu z t
     Just Menu -> goMenu z
 
@@ -51,7 +52,8 @@ repl = do
         initialLevel = t1,
         zipper = (Hole, t1),
         movesCount = 0,
-        bonusCount = 0
+        bonusCount = 0,
+        inventory = Nothing
       }
 
 main = repl
