@@ -141,17 +141,22 @@ handlePick goGame goMenu z = do
       putStrLn "Your inventory is full."
       goGame z
     Nothing -> do
-      putStrLn $ "Picking " ++ show item ++ " up."
-      goGame
-        ( GameState
-            { levelIdent = levelIdent z,
-              initialLevel = initialLevel z,
-              zipper = zipper z,
-              movesCount = movesCount z,
-              bonusCount = bonusCount z,
-              inventory = item
-            }
-        )
+      case item of
+        Just it -> do
+          putStrLn $ "Picking " ++ show it ++ " up."
+          goGame
+            ( GameState
+                { levelIdent = levelIdent z,
+                  initialLevel = initialLevel z,
+                  zipper = zipper z,
+                  movesCount = movesCount z,
+                  bonusCount = bonusCount z,
+                  inventory = item
+                }
+            )
+        Nothing -> do
+          putStrLn "Nothing to pick."
+          goGame z
 
 handleGoto :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> String -> IO ()
 handleGoto goGame goMenu z t = do
