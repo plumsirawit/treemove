@@ -3,19 +3,25 @@ module HandlerMenu where
 import Data.Maybe (fromJust)
 import GameState
 import Level
+import LevelSeq
 
 handleSelect :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> String -> IO ()
-handleSelect goGame goMenu z s =
+handleSelect goGame goMenu z s = do
   let newlv = loadLevel s
-   in goGame $
+  case newlv of
+    Just nlvid ->
+      goGame $
         GameState
           { levelIdent = s,
-            initialLevel = newlv,
-            zipper = (Hole, newlv),
+            initialLevel = nlvid,
+            zipper = fromJust $ zipToStart nlvid,
             movesCount = 0,
             bonusCount = 0,
             inventory = inventory z
           }
+    Nothing -> do
+      putStrLn $ "Failed to load level " ++ s ++ "!"
+      goGame z
 
 handleReset :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
 handleReset goGame goMenu z =
