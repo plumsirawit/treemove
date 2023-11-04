@@ -54,12 +54,13 @@ goMenu z = do
     Just Reset -> handleReset goGame goMenu z
     Just Quit -> handleQuit goGame goMenu z
     Just HelpMenu -> handleHelpMenu goGame goMenu z
+    Just Status -> handleStatus goGame goMenu z
 
 -- the top-level interactive loop
 repl :: IO ()
 repl = do
   putStrLn "Welcome to Treemove.\n"
-  putStrLn "You are at the example level."
+  putStrLn "You are at the first level."
   handleReset
     goGame
     goMenu

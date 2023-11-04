@@ -110,7 +110,7 @@ parseHelpGame = do
   return HelpGame
 
 parseMenuCmd :: Parser String MenuCmd
-parseMenuCmd = parseSelect <|> parseResume <|> parseReset <|> parseQuit <|> parseHelpMenu
+parseMenuCmd = parseSelect <|> parseResume <|> parseReset <|> parseQuit <|> parseHelpMenu <|> parseStatus
 
 parseSelect :: Parser String MenuCmd
 parseSelect = do
@@ -138,6 +138,11 @@ parseHelpMenu :: Parser String MenuCmd
 parseHelpMenu = do
   match "help" <|> match "h"
   return HelpMenu
+
+parseStatus :: Parser String MenuCmd
+parseStatus = do
+  match "status"
+  return Status
 
 parseInput :: MonadFail m => Parser String a -> String -> m a
 parseInput p s = case runParser p (words s) of

@@ -50,3 +50,12 @@ handleHelpMenu goGame goMenu z = do
   putStrLn "`help`                   -- show this list of available menu options"
   putStrLn "========================================================================"
   goGame z
+
+handleStatus :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
+handleStatus goGame goMenu z = do
+  putStrLn "============================== Game Status ============================="
+  putStrLn $ "Current level:   " ++ levelIdent z
+  putStrLn $ "Number of moves: " ++ show (movesCount z)
+  putStrLn $ "Bonus count:     " ++ show (bonusCount z)
+  putStrLn "========================================================================"
+  goGame z
