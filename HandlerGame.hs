@@ -51,20 +51,15 @@ handleCheck goGame goMenu z = do
     Nothing -> putStrLn "You have nothing in your inventory."
   goGame z
 
--- changes W to E, Gate to E
-mutateNode :: LZip -> Maybe LZip
-mutateNode (cxt, tr) =
-  case fst $ rootLabel tr of
-    W -> Just (cxt, Node (E, snd $ rootLabel tr) (subForest tr))
-    Gate _ -> Just (cxt, Node (E, snd $ rootLabel tr) (subForest tr))
-    _ -> Nothing
+mutateNode :: LZip -> LType -> LZip
+mutateNode (cxt, tr) lt = (cxt, Node (lt, snd $ rootLabel tr) (subForest tr))
 
 mutateTree :: GoDir -> LZip -> LZip
 mutateTree dir z =
   let cur = snd $ rootLabel $ snd z
    in case dir of
-        Up k -> fromJust $ goDown (fromJust $ mutateNode $ fromJust $ goUp z) cur
-        Down k -> fromJust $ goUp $ fromJust $ mutateNode $ fromJust $ goDown z (snd k)
+        Up k -> fromJust $ goDown (mutateNode (fromJust $ goUp z) E) cur
+        Down k -> fromJust $ goUp $ mutateNode (fromJust $ goDown z (snd k)) E
 
 handleUse :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> String -> IO ()
 handleUse goGame goMenu z t = do
@@ -123,7 +118,7 @@ handleDrop goGame goMenu z =
             ( GameState
                 { levelIdent = levelIdent z,
                   initialLevel = initialLevel z,
-                  zipper = zipper z,
+                  zipper = mutateNode (zipper z) (toType it),
                   movesCount = movesCount z,
                   bonusCount = bonusCount z,
                   inventory = Nothing
@@ -148,7 +143,7 @@ handlePick goGame goMenu z = do
             ( GameState
                 { levelIdent = levelIdent z,
                   initialLevel = initialLevel z,
-                  zipper = zipper z,
+                  zipper = mutateNode (zipper z) E,
                   movesCount = movesCount z,
                   bonusCount = bonusCount z,
                   inventory = item
@@ -176,7 +171,7 @@ handleGoto goGame goMenu z t = do
                       ( GameState
                           { levelIdent = levelIdent z,
                             initialLevel = initialLevel z,
-                            zipper = (ncxt, Node (E, snd (rootLabel ntr)) (subForest ntr)),
+                            zipper = mutateNode (ncxt, ntr) E,
                             movesCount = 1 + movesCount z,
                             bonusCount = 1 + bonusCount z,
                             inventory = inventory z
@@ -204,16 +199,30 @@ handleGoto goGame goMenu z t = do
         Just (ncxt, ntr) ->
           if checkLegal (ncxt, ntr)
             then
-              goGame
-                ( GameState
-                    { levelIdent = levelIdent z,
-                      initialLevel = initialLevel z,
-                      zipper = (ncxt, ntr),
-                      movesCount = 1 + movesCount z,
-                      bonusCount = bonusCount z,
-                      inventory = inventory z
-                    }
-                )
+              ( if fst (rootLabel ntr) == Z
+                  then
+                    goGame
+                      ( GameState
+                          { levelIdent = levelIdent z,
+                            initialLevel = initialLevel z,
+                            zipper = mutateNode (ncxt, ntr) E,
+                            movesCount = 1 + movesCount z,
+                            bonusCount = 1 + bonusCount z,
+                            inventory = inventory z
+                          }
+                      )
+                  else
+                    goGame
+                      ( GameState
+                          { levelIdent = levelIdent z,
+                            initialLevel = initialLevel z,
+                            zipper = (ncxt, ntr),
+                            movesCount = 1 + movesCount z,
+                            bonusCount = bonusCount z,
+                            inventory = inventory z
+                          }
+                      )
+              )
             else do
               putStrLn "You cannot go there."
               goGame z

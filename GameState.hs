@@ -4,7 +4,11 @@ import Data.Tree
 import Level
 
 data Item = ItemBox | ItemKey Char
-  deriving (Show, Eq, Ord)
+  deriving (Eq, Ord)
+
+instance Show Item where
+  show ItemBox = "a box"
+  show (ItemKey c) = "the key " ++ [c]
 
 data GameState = GameState
   { levelIdent :: String,
@@ -25,3 +29,8 @@ getItem (c, t) = case fst $ rootLabel t of
   Key x -> Just (ItemKey x)
   Gate _ -> Nothing
   Z -> Nothing
+
+toType :: Item -> LType
+toType item = case item of
+  ItemBox -> B
+  ItemKey s -> Key s
