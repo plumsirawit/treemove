@@ -41,7 +41,7 @@ handleLook goGame goMenu z = do
   let nbhood = case cxt of
         Hole -> chs
         TreeHole k _ _ -> k : chs
-  putStrLn $ intercalate ", " $ map (\x -> show (fst x) ++ "(" ++ snd x ++ ")") nbhood
+  putStrLn $ intercalate ", " $ map (\x -> show (fst x) ++ "(" ++ snd x ++ ")") $ sortBy (\a b -> compare (snd a) (snd b)) nbhood
   goGame z
 
 handleCheck :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
@@ -166,7 +166,8 @@ handleGoto goGame goMenu z t = do
           if checkLegal (ncxt, ntr)
             then
               ( if fst (rootLabel ntr) == Z
-                  then
+                  then do
+                    putStrLn "You received a bonus!"
                     goGame
                       ( GameState
                           { levelIdent = levelIdent z,
@@ -200,7 +201,8 @@ handleGoto goGame goMenu z t = do
           if checkLegal (ncxt, ntr)
             then
               ( if fst (rootLabel ntr) == Z
-                  then
+                  then do
+                    putStrLn "You received a bonus!"
                     goGame
                       ( GameState
                           { levelIdent = levelIdent z,
