@@ -53,7 +53,7 @@ label :: Parser String String
 label = sat (const True) -- get any string
 
 parseCmd :: Parser String Cmd
-parseCmd = parseWhere <|> parseLook <|> parseCheck <|> parseUse <|> parseDrop <|> parsePick <|> parseGoto <|> parseMenu
+parseCmd = parseWhere <|> parseLook <|> parseCheck <|> parseUse <|> parseDrop <|> parsePick <|> parseGoto <|> parseMenu <|> parseHelpGame
 
 parseWhere :: Parser String Cmd
 parseWhere = do
@@ -80,9 +80,6 @@ parseUse = do
   n <- label
   return $ UseInventoryWith n
 
--- todo: import context of the level to the parser, to check whether the label is a valid node or not.
--- (or should we handle that outside the parser -- the functionality is actually irrelevant to parsing)
-
 parseDrop :: Parser String Cmd
 parseDrop = do
   match "drop"
@@ -107,8 +104,13 @@ parseMenu = do
   match "menu"
   return Menu
 
+parseHelpGame :: Parser String Cmd
+parseHelpGame = do
+  match "help" <|> match "h"
+  return HelpGame
+
 parseMenuCmd :: Parser String MenuCmd
-parseMenuCmd = parseSelect <|> parseResume <|> parseReset <|> parseQuit
+parseMenuCmd = parseSelect <|> parseResume <|> parseReset <|> parseQuit <|> parseHelpMenu
 
 parseSelect :: Parser String MenuCmd
 parseSelect = do
@@ -131,6 +133,11 @@ parseQuit :: Parser String MenuCmd
 parseQuit = do
   match "quit" <|> match "q"
   return Quit
+
+parseHelpMenu :: Parser String MenuCmd
+parseHelpMenu = do
+  match "help" <|> match "h"
+  return HelpMenu
 
 parseInput :: MonadFail m => Parser String a -> String -> m a
 parseInput p s = case runParser p (words s) of

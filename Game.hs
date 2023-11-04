@@ -28,7 +28,7 @@ goGame z =
       line <- getLine
       case parseInput parseCmd line of
         Nothing -> do
-          putStrLn "I'm sorry, I do not understand."
+          putStrLn "I'm sorry, I do not understand. (Type `help` to get the list of available controls.)"
           goGame z
         Just Where -> handleWhere goGame goMenu z
         Just LookAround -> handleLook goGame goMenu z
@@ -38,6 +38,7 @@ goGame z =
         Just PickInventory -> handlePick goGame goMenu z
         Just (Goto t) -> handleGoto goGame goMenu z t
         Just Menu -> goMenu z
+        Just HelpGame -> handleHelpGame goGame goMenu z
 
 goMenu :: GameState -> IO ()
 goMenu z = do
@@ -46,12 +47,13 @@ goMenu z = do
   line <- getLine
   case parseInput parseMenuCmd line of
     Nothing -> do
-      putStrLn "I'm sorry, I do not understand."
+      putStrLn "I'm sorry, I do not understand. (Type `help` to get the list of available options.)"
       goMenu z
     Just (SelectAnotherLevel s) -> handleSelect goGame goMenu z s
     Just Resume -> goGame z
     Just Reset -> handleReset goGame goMenu z
     Just Quit -> handleQuit goGame goMenu z
+    Just HelpMenu -> handleHelpMenu goGame goMenu z
 
 -- the top-level interactive loop
 repl :: IO ()

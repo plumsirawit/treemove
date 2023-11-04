@@ -39,3 +39,14 @@ handleQuit :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
 handleQuit goGame goMenu z = do
   putStrLn "Goodbye."
   return ()
+
+handleHelpMenu :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
+handleHelpMenu goGame goMenu z = do
+  putStrLn "========================= List of menu options ========================="
+  putStrLn "`select level <L>`       -- change the level to <L>"
+  putStrLn "`resume`                 -- resume the game"
+  putStrLn "`reset`                  -- reset the current level"
+  putStrLn "`quit`                   -- leave the game"
+  putStrLn "`help`                   -- show this list of available menu options"
+  putStrLn "========================================================================"
+  goGame z

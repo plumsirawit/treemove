@@ -215,3 +215,22 @@ handleGoto goGame goMenu z t = do
         Nothing -> do
           putStrLn "You cannot go there."
           goGame z
+
+handleHelpGame :: (GameState -> IO ()) -> (GameState -> IO ()) -> GameState -> IO ()
+handleHelpGame goGame goMenu z = do
+  putStrLn "====================== List of available controls ======================"
+  putStrLn "`where`                  -- ask for your current position"
+  putStrLn "`look around`            -- see types and names of the neighboring nodes"
+  putStrLn "`check inventory`        -- check your current inventory"
+  putStrLn "`use inventory with <L>` -- use your current inventory with <L>"
+  putStrLn "                            (note that <L> has to be a neighboring node)"
+  putStrLn "`drop inventory`         -- drop your current item from your inventory"
+  putStrLn "                            (note that the current node has to be empty)"
+  putStrLn "`pick inventory`         -- pick up the item in the current node"
+  putStrLn "                            (note that your inventory must be empty)"
+  putStrLn "`go to <L>`              -- move to <L>"
+  putStrLn "                            (note that <L> has to be a neighboring node)"
+  putStrLn "`menu`                   -- show the game menu"
+  putStrLn "`help`                   -- show this list of available controls"
+  putStrLn "========================================================================"
+  goGame z
