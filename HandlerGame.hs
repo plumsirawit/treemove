@@ -163,19 +163,42 @@ handleGoto goGame goMenu z t = do
     Just dir -> case dir of
       Up _ -> case goUp (cxt, tr) of
         Just (ncxt, ntr) ->
-          if fst (rootLabel ntr) == Z
+          if checkLegal (ncxt, ntr)
             then
-              goGame
-                ( GameState
-                    { levelIdent = levelIdent z,
-                      initialLevel = initialLevel z,
-                      zipper = (ncxt, Node (E, snd (rootLabel ntr)) (subForest ntr)),
-                      movesCount = 1 + movesCount z,
-                      bonusCount = 1 + bonusCount z,
-                      inventory = inventory z
-                    }
-                )
-            else
+              ( if fst (rootLabel ntr) == Z
+                  then
+                    goGame
+                      ( GameState
+                          { levelIdent = levelIdent z,
+                            initialLevel = initialLevel z,
+                            zipper = (ncxt, Node (E, snd (rootLabel ntr)) (subForest ntr)),
+                            movesCount = 1 + movesCount z,
+                            bonusCount = 1 + bonusCount z,
+                            inventory = inventory z
+                          }
+                      )
+                  else
+                    goGame
+                      ( GameState
+                          { levelIdent = levelIdent z,
+                            initialLevel = initialLevel z,
+                            zipper = (ncxt, ntr),
+                            movesCount = 1 + movesCount z,
+                            bonusCount = bonusCount z,
+                            inventory = inventory z
+                          }
+                      )
+              )
+            else do
+              putStrLn "You cannot go there."
+              goGame z
+        Nothing -> do
+          putStrLn "You cannot go there."
+          goGame z
+      Down tt -> case goDown (cxt, tr) (snd tt) of
+        Just (ncxt, ntr) ->
+          if checkLegal (ncxt, ntr)
+            then
               goGame
                 ( GameState
                     { levelIdent = levelIdent z,
@@ -186,21 +209,9 @@ handleGoto goGame goMenu z t = do
                       inventory = inventory z
                     }
                 )
-        Nothing -> do
-          putStrLn "You cannot go there."
-          goGame z
-      Down tt -> case goDown (cxt, tr) (snd tt) of
-        Just (ncxt, ntr) ->
-          goGame
-            ( GameState
-                { levelIdent = levelIdent z,
-                  initialLevel = initialLevel z,
-                  zipper = (ncxt, ntr),
-                  movesCount = 1 + movesCount z,
-                  bonusCount = bonusCount z,
-                  inventory = inventory z
-                }
-            )
+            else do
+              putStrLn "You cannot go there."
+              goGame z
         Nothing -> do
           putStrLn "You cannot go there."
           goGame z
