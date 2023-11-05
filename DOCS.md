@@ -27,7 +27,7 @@ In `Levels.hs`: `LType`, `LNode`, `LTree`, `LTreeCxt`, `LZip` are data types for
 
 ### Higher order functions
 
-Each handler in `HandlerGame.hs` and `HandlerMenu.hs` can be thought of as a higher order function which retrieves `goGame` and `goMenu` as continuation callbacks and returns a function from `GameState` to `IO()`.
+Each handler in `HandlerGame.hs` and `HandlerMenu.hs` can be thought of as a higher order function which retrieves `goGame` and `goMenu` as continuation callbacks and returns a function from `GameState` to `IO ()`.
 
 ### Lambda calculus
 
@@ -35,7 +35,7 @@ Deep concepts from lambda calculus aren't presented much in this project, but la
 
 ### Side-effects
 
-There are no explicit other side-effects apart from input/output (shown as `IO()`). As `putStrLn` and `getLine` gives the IO side effects, all code in the handler part are written in IO Monads.
+There are no explicit other side-effects apart from input/output (shown as `IO ()`). As `putStrLn` and `getLine` gives the IO side effects, all code in the handler part are written in IO Monads.
 
 ### Laziness
 
