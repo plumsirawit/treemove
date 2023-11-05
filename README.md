@@ -8,7 +8,7 @@ If you're using `ghc`, you can `ghc Game.hs -o Game` and then `./Game` directly.
 
 ## About this game
 
-Treemove is a text-based single-player puzzle-adventure game (currently) composed of 4 levels. It is inspired by [Sokoban](https://en.wikipedia.org/wiki/Sokoban), (heavily from) Zeek the Geek and (heavily from) [Wonderland Secret Worlds](https://www.midnightsynergy.com/secretworlds/). In each level, the game map is a tree where the player initially lives inside a node (starting node, `S`) of the tree. The goal of the level is for the player to reach the exit node (`F`).
+Treemove is a text-based single-player puzzle-adventure game (currently) composed of 5 levels. It is inspired by [Sokoban](https://en.wikipedia.org/wiki/Sokoban), (heavily from) Zeek the Geek and (heavily from) [Wonderland Secret Worlds](https://www.midnightsynergy.com/secretworlds/). In each level, the game map is a tree where the player initially lives inside a node (starting node, `S`) of the tree. The goal of the level is for the player to reach the exit node (`F`).
 
 Following is the list of types of nodes.
 
